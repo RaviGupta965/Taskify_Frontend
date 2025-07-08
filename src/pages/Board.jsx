@@ -5,6 +5,8 @@ import io from "socket.io-client";
 import TaskCard from "../components/Taskcard.jsx";
 import { Plus, User, ListChecks, Flag } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+
 const socket = io("https://taskify-backend-o0m0.onrender.com/");
 
 export default function Board() {
@@ -51,6 +53,27 @@ export default function Board() {
       ...prev,
       [task.status]: task.priority,
     }));
+  };
+
+  const handleDragEnd = async (result) => {
+    const { source, destination, draggableId } = result;
+
+    if (!destination || source.droppableId === destination.droppableId) return;
+
+    try {
+      await axios.patch(
+        `https://taskify-backend-o0m0.onrender.com/api/tasks/${draggableId}`,
+        {
+          status: destination.droppableId,
+          version: tasks.find((t) => t._id === draggableId).version,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      socket.emit("task-change", id);
+      await fetchTasks();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleDelete = async (taskId) => {
@@ -261,114 +284,115 @@ export default function Board() {
         <h1 className="text-3xl font-bold mb-8 text-center">
           📋 Project Board
         </h1>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+            {["Todo", "In Progress", "Done"].map((status) => (
+              <div
+                key={status}
+                className={`rounded-lg p-4 shadow border ${columnColors[status]} flex flex-col`}
+              >
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <ListChecks size={20} /> {status}
+                </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-          {["Todo", "In Progress", "Done"].map((status) => (
-            <div
-              key={status}
-              className={`rounded-lg p-4 shadow border ${columnColors[status]} flex flex-col`}
-            >
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <ListChecks size={20} /> {status}
-              </h2>
-
-              <input
-                value={newTasks[status].title}
-                onChange={(e) =>
-                  setNewTasks((prev) => ({
-                    ...prev,
-                    [status]: {
-                      ...prev[status],
-                      title: e.target.value,
-                    },
-                  }))
-                }
-                placeholder="Task title"
-                className="border px-3 py-2 rounded mb-2 w-full"
-              />
-
-              <textarea
-                value={newTasks[status].description}
-                onChange={(e) =>
-                  setNewTasks((prev) => ({
-                    ...prev,
-                    [status]: {
-                      ...prev[status],
-                      description: e.target.value,
-                    },
-                  }))
-                }
-                placeholder="Description"
-                className="border px-3 py-2 rounded mb-2 w-full resize-none"
-              />
-
-              <div className="flex items-center gap-2 mb-2">
-                <Flag size={16} className="text-gray-500" />
-                <select
-                  value={priorities[status]}
+                <input
+                  value={newTasks[status].title}
                   onChange={(e) =>
-                    setPriorities((prev) => ({
+                    setNewTasks((prev) => ({
                       ...prev,
-                      [status]: e.target.value,
+                      [status]: {
+                        ...prev[status],
+                        title: e.target.value,
+                      },
                     }))
                   }
-                  className="border px-3 py-2 rounded w-full"
-                >
-                  <option value="">Priority</option>
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
-                </select>
-              </div>
+                  placeholder="Task title"
+                  className="border px-3 py-2 rounded mb-2 w-full"
+                />
 
-              <div className="flex items-center gap-2 mb-2">
-                <User size={16} className="text-gray-500" />
-                <select
-                  value={assignedTo[status]}
+                <textarea
+                  value={newTasks[status].description}
                   onChange={(e) =>
-                    setAssignedTo((prev) => ({
+                    setNewTasks((prev) => ({
                       ...prev,
-                      [status]: e.target.value,
+                      [status]: {
+                        ...prev[status],
+                        description: e.target.value,
+                      },
                     }))
                   }
-                  className="border px-3 py-2 rounded w-full"
-                >
-                  <option value="">Assign to</option>
-                  {members.map((m) => (
-                    <option key={m._id} value={m._id}>
-                      {m.username}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  placeholder="Description"
+                  className="border px-3 py-2 rounded mb-2 w-full resize-none"
+                />
 
-              <button
-                onClick={() => handleCreateTask(status)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded w-full flex items-center justify-center gap-2 mb-4"
-              >
-                <Plus size={18} /> Add Task
-              </button>
-              <button
-                onClick={() => handleSmartAssign(status)}
-                className="bg-green-500 text-white px-4 py-2 rounded w-full mb-2 hover:bg-green-600"
-              >
-                Smart Assign
-              </button>
-              {grouped[status].length === 0 ? (
-                <p className="text-gray-500 italic text-sm">No tasks</p>
-              ) : (
-                grouped[status].map((task) => (
-                  <TaskCard
-                    key={task._id}
-                    task={task}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                ))
-              )}
-            </div>
-          ))}
-        </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Flag size={16} className="text-gray-500" />
+                  <select
+                    value={priorities[status]}
+                    onChange={(e) =>
+                      setPriorities((prev) => ({
+                        ...prev,
+                        [status]: e.target.value,
+                      }))
+                    }
+                    className="border px-3 py-2 rounded w-full"
+                  >
+                    <option value="">Priority</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2 mb-2">
+                  <User size={16} className="text-gray-500" />
+                  <select
+                    value={assignedTo[status]}
+                    onChange={(e) =>
+                      setAssignedTo((prev) => ({
+                        ...prev,
+                        [status]: e.target.value,
+                      }))
+                    }
+                    className="border px-3 py-2 rounded w-full"
+                  >
+                    <option value="">Assign to</option>
+                    {members.map((m) => (
+                      <option key={m._id} value={m._id}>
+                        {m.username}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  onClick={() => handleCreateTask(status)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded w-full flex items-center justify-center gap-2 mb-4"
+                >
+                  <Plus size={18} /> Add Task
+                </button>
+                <button
+                  onClick={() => handleSmartAssign(status)}
+                  className="bg-green-500 text-white px-4 py-2 rounded w-full mb-2 hover:bg-green-600"
+                >
+                  Smart Assign
+                </button>
+                {grouped[status].length === 0 ? (
+                  <p className="text-gray-500 italic text-sm">No tasks</p>
+                ) : (
+                  grouped[status].map((task) => (
+                    <TaskCard
+                      key={task._id}
+                      task={task}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                    />
+                  ))
+                )}
+              </div>
+            ))}
+          </div>
+        </DragDropContext>
       </div>
     </>
   );
