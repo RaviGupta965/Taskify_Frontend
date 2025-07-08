@@ -57,7 +57,7 @@ export default function Board() {
 
   const handleDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
-
+    console.log(result);
     if (!destination || source.droppableId === destination.droppableId) return;
 
     try {
@@ -377,18 +377,42 @@ export default function Board() {
                 >
                   Smart Assign
                 </button>
-                {grouped[status].length === 0 ? (
-                  <p className="text-gray-500 italic text-sm">No tasks</p>
-                ) : (
-                  grouped[status].map((task) => (
-                    <TaskCard
-                      key={task._id}
-                      task={task}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                    />
-                  ))
-                )}
+                <Droppable droppableId={status}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="flex flex-col gap-2 min-h-[150px] bg-white rounded p-2"
+                    >
+                      {grouped[status].length === 0 ? (
+                        <p className="text-gray-500 italic text-sm">No tasks</p>
+                      ) : (
+                        grouped[status].map((task, index) => (
+                          <Draggable
+                            key={task._id}
+                            draggableId={task._id}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <TaskCard
+                                  task={task}
+                                  onEdit={handleEdit}
+                                  onDelete={handleDelete}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
+                        ))
+                      )}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
               </div>
             ))}
           </div>
