@@ -62,7 +62,6 @@ export default function Board() {
     if (!projectId || !token) return;
 
     try {
-      console.log("Fetching tasks for project ID:", projectId);
       const res = await axios.get(
         `https://taskify-backend-o0m0.onrender.com/api/tasks/project/${projectId}`,
         {
@@ -71,19 +70,12 @@ export default function Board() {
       );
       setTasks(res.data);
     } catch (err) {
-      console.error("ERROR :: WHILE FETCHING TASKS");
-      console.error("Status:", err?.response?.status);
-      console.error("Message:", err?.message);
-      console.error(
-        "Error Data:",
-        JSON.stringify(err?.response?.data, null, 2)
-      );
+      console.error("ERROR :: WHILE FETCHING TASKS",err);
     }
   };
 
   const handleDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
-    console.log(result);
     if (!destination || source.droppableId === destination.droppableId) return;
 
     try {
@@ -124,7 +116,6 @@ export default function Board() {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    console.log(res.data);
     setMembers(res.data);
   };
 
@@ -143,7 +134,6 @@ export default function Board() {
     socket.emit("joinProject", id);
 
     const handleTaskUpdate = async () => {
-      console.log("Syncing Tasks");
       await fetchTasks(id);
     };
 
