@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useLocation } from "react-router-dom";
 
-const socket = io("https://taskify-backend-o0m0.onrender.com/", {
+const socket = io("https://taskify-backend-o0m0.onrender.com", {
   auth: { token: localStorage.getItem("token") },
 });
 
@@ -58,7 +58,7 @@ export default function Board() {
     }));
   };
 
-  const fetchTasks = async (projectId, retries = 2, delay = 300) => {
+  const fetchTasks = async (projectId) => {
     if (!projectId || !token) return;
 
     try {
@@ -71,12 +71,7 @@ export default function Board() {
       );
       setTasks(res.data);
     } catch (err) {
-      if (retries > 0 && err.response?.status === 400) {
-        console.warn(`Retrying fetchTasks in ${delay}ms...`, err.message);
-        setTimeout(() => fetchTasks(projectId, retries - 1, delay * 2), delay);
-      } else {
-        console.error("fetchTasks error:", err);
-      }
+      console.log('ERROR :: WHILE FETCHING TASKS',err);
     }
   };
 
