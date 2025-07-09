@@ -121,7 +121,7 @@ export default function Board() {
     fetchTasks();
     fetchMembers(id);
 
-    socket.emit("join-board", id);
+    socket.emit("joinProject", id);
 
     const handleTaskUpdate = () => {
       fetchTasks();
@@ -130,7 +130,7 @@ export default function Board() {
     socket.on("task-updated", handleTaskUpdate);
 
     return () => {
-      socket.emit("leave-board", id);
+      socket.emit("leaveProject", id);
       socket.off("task-updated", handleTaskUpdate);
     };
   }, [id, location.key]);
