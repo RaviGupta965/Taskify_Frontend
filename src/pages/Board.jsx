@@ -117,10 +117,18 @@ export default function Board() {
       console.error(err);
     }
   };
-  
+
   useEffect(() => {
-    fetchTasks();
-    fetchMembers(id);
+    const init = async () => {
+      try {
+        await fetchTasks();
+        await fetchMembers(id);
+      } catch (err) {
+        console.error("Init error:", err);
+      }
+    };
+
+    init(); // Run async logic
 
     socket.emit("joinProject", id);
 
@@ -135,7 +143,6 @@ export default function Board() {
       socket.off("task-updated", handleTaskUpdate);
     };
   }, [id, location.key]);
-
 
   const handleCreateTask = async (status) => {
     const { title, description } = newTasks[status];
@@ -388,38 +395,38 @@ export default function Board() {
                 >
                   Smart Assign
                 </button>
-                  <Droppable droppableId={status}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className="flex flex-col gap-2 min-h-[150px] bg-white rounded p-2" // optional: set min-height
-                      >
-                        {grouped[status].map((task, index) => (
-                          <Draggable
-                            key={task._id}
-                            draggableId={task._id}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <TaskCard
-                                  task={task}
-                                  onEdit={handleEdit}
-                                  onDelete={handleDelete}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
+                <Droppable droppableId={status}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="flex flex-col gap-2 min-h-[150px] bg-white rounded p-2" // optional: set min-height
+                    >
+                      {grouped[status].map((task, index) => (
+                        <Draggable
+                          key={task._id}
+                          draggableId={task._id}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <TaskCard
+                                task={task}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
               </div>
             ))}
           </div>
