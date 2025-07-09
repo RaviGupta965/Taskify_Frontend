@@ -58,7 +58,9 @@ export default function Board() {
     }));
   };
 
-  const fetchTasks = async (projectId) => {
+  const fetchTasks = async (projectId, retries = 2, delay = 300) => {
+    if (!projectId || !token) return;
+
     try {
       console.log("Fetching tasks for project ID:", projectId);
       const res = await axios.get(
@@ -69,10 +71,15 @@ export default function Board() {
       );
       setTasks(res.data);
     } catch (err) {
-      console.error(err);
+      if (retries > 0 && err.response?.status === 400) {
+        console.warn(`Retrying fetchTasks in ${delay}ms...`, err.message);
+        setTimeout(() => fetchTasks(projectId, retries - 1, delay * 2), delay);
+      } else {
+        console.error("fetchTasks error:", err);
+      }
     }
   };
-  
+
   const handleDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
     console.log(result);
@@ -135,7 +142,7 @@ export default function Board() {
     socket.emit("joinProject", id);
 
     const handleTaskUpdate = async () => {
-      console.log('Syncing Tasks');
+      console.log("Syncing Tasks");
       await fetchTasks(id);
     };
 
