@@ -112,6 +112,7 @@ export default function Board() {
         }
       );
       setTasks(res.data);
+      console.log(res.data);
     } catch (err) {
       console.error(err);
     }
