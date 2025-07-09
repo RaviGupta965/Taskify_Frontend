@@ -36,7 +36,7 @@ export default function Board() {
     "In Progress": "",
     Done: "",
   });
-
+  const location = useLocation();
   const token = localStorage.getItem("token");
 
   const handleEdit = (task) => {
@@ -103,19 +103,6 @@ export default function Board() {
     );
     setMembers(res.data);
   };
-  useEffect(() => {
-    fetchTasks();
-    fetchMembers(id);
-    socket.emit("join-board", id);
-
-    socket.on("task-updated", fetchTasks);
-
-    return () => {
-      socket.emit("leave-board", id);
-      socket.off("task-updated", fetchTasks);
-    };
-  }, [id, location.key]);
-
   const fetchTasks = async () => {
     try {
       const res = await axios.get(
@@ -129,6 +116,25 @@ export default function Board() {
       console.error(err);
     }
   };
+  
+  useEffect(() => {
+    fetchTasks();
+    fetchMembers(id);
+
+    socket.emit("join-board", id);
+
+    const handleTaskUpdate = () => {
+      fetchTasks();
+    };
+
+    socket.on("task-updated", handleTaskUpdate);
+
+    return () => {
+      socket.emit("leave-board", id);
+      socket.off("task-updated", handleTaskUpdate);
+    };
+  }, [id, location.key]);
+
 
   const handleCreateTask = async (status) => {
     const { title, description } = newTasks[status];
