@@ -6,8 +6,11 @@ import TaskCard from "../components/Taskcard.jsx";
 import { Plus, User, ListChecks, Flag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { useLocation } from "react-router-dom";
 
-const socket = io("https://taskify-backend-o0m0.onrender.com/");
+const socket = io("https://taskify-backend-o0m0.onrender.com/", {
+  auth: { token: localStorage.getItem("token") },
+});
 
 export default function Board() {
   const { name, id } = useParams();
@@ -102,15 +105,16 @@ export default function Board() {
   };
   useEffect(() => {
     fetchTasks();
-    socket.emit("join-board", id);
     fetchMembers(id);
+    socket.emit("join-board", id);
 
-    socket.on("task-updated", () => {
-      fetchTasks();
-    });
+    socket.on("task-updated", fetchTasks);
 
-    return () => socket.emit("leave-board", id);
-  }, [id]);
+    return () => {
+      socket.emit("leave-board", id);
+      socket.off("task-updated", fetchTasks);
+    };
+  }, [id, location.key]);
 
   const fetchTasks = async () => {
     try {
@@ -377,17 +381,17 @@ export default function Board() {
                 >
                   Smart Assign
                 </button>
-                <Droppable droppableId={status}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className="flex flex-col gap-2 min-h-[150px] bg-white rounded p-2"
-                    >
-                      {grouped[status].length === 0 ? (
-                        <p className="text-gray-500 italic text-sm">No tasks</p>
-                      ) : (
-                        grouped[status].map((task, index) => (
+                {grouped[status].length === 0 ? (
+                  <p className="text-gray-500 italic text-sm">No tasks</p>
+                ) : (
+                  <Droppable droppableId={status}>
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className="flex flex-col gap-2 min-h-[150px] bg-white rounded p-2" // optional: set min-height
+                      >
+                        {grouped[status].map((task, index) => (
                           <Draggable
                             key={task._id}
                             draggableId={task._id}
@@ -407,12 +411,12 @@ export default function Board() {
                               </div>
                             )}
                           </Draggable>
-                        ))
-                      )}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                )}
               </div>
             ))}
           </div>
