@@ -133,6 +133,7 @@ export default function Board() {
     socket.emit("joinProject", id);
 
     const handleTaskUpdate = () => {
+      console.lof('Syncing Tasks');
       fetchTasks();
     };
 
