@@ -106,6 +106,7 @@ export default function Board() {
   };
   const fetchTasks = async () => {
     try {
+      console.log("Fetching tasks for project ID:", id);
       const res = await axios.get(
         `https://taskify-backend-o0m0.onrender.com/api/tasks/project/${id}`,
         {
