@@ -71,7 +71,13 @@ export default function Board() {
       );
       setTasks(res.data);
     } catch (err) {
-      console.log('ERROR :: WHILE FETCHING TASKS',err);
+      console.error("ERROR :: WHILE FETCHING TASKS");
+      console.error("Status:", err?.response?.status);
+      console.error("Message:", err?.message);
+      console.error(
+        "Error Data:",
+        JSON.stringify(err?.response?.data, null, 2)
+      );
     }
   };
 
