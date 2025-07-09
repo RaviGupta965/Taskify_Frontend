@@ -101,6 +101,7 @@ export default function Board() {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
+    console.log(res.data);
     setMembers(res.data);
   };
   const fetchTasks = async () => {
@@ -112,7 +113,6 @@ export default function Board() {
         }
       );
       setTasks(res.data);
-      console.log(res.data);
     } catch (err) {
       console.error(err);
     }
