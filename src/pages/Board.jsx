@@ -234,6 +234,7 @@ export default function Board() {
         }
       );
 
+      await fetchTasks();
       setNewTasks((prev) => ({
         ...prev,
         [status]: { title: "", description: "" },
