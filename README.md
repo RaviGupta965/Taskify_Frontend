@@ -1,12 +1,53 @@
-# React + Vite
+# 🧠 Taskify - Real-time Collaborative Task Board
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Taskify is a real-time, collaborative task management platform built for teams. Organize your projects, assign tasks smartly, and manage workflows with drag-and-drop ease—just like Trello, but smarter!
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🧑‍🤝‍🧑 **Multi-user collaboration** per project
+- 📂 **Multiple boards/projects** support
+- 📌 **Task creation, editing, and deletion**
+- 🧠 **Smart Assign** – Auto-assign tasks to the most suitable team member
+- 🎯 **Activity Logs** – Track task updates
+- 🔄 **Real-time sync** with Socket.IO
+- 🔃 **Drag & drop** task movement between statuses
+- 🔐 **JWT-based Authentication**
+- ✉️ **Email invitations** to join boards (coming soon)
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Frontend
+- React.js
+- TailwindCSS
+- Axios
+- React DnD (`@hello-pangea/dnd`)
+- Socket.IO Client
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB + Mongoose
+- Socket.IO
+- JSON Web Tokens (JWT)
+
+## ⚙️ Setup Instructions
+
+1. **Frontend**
+
+```bash
+git clone https://github.com/RaviGupta965/Taskify_Frontend.git
+cd Taskify_Frontend
+npm install
+npm run dev
+
+
+
+1. **Backend**
+
+```bash
+git clone https://github.com/RaviGupta965/Taskify_Backend.git
+cd Taskify_Backend
+npm install
+npm run dev
+
+Backend is Deployed at https://taskify-backend-o0m0.onrender.com
