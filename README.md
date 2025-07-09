@@ -2,6 +2,10 @@
 
 Taskify is a real-time, collaborative task management platform built for teams. Organize your projects, assign tasks smartly, and manage workflows with drag-and-drop ease—just like Trello, but smarter!
 
+
+https://github.com/user-attachments/assets/cf290705-c021-4237-8ae3-6075b1ea19ec
+
+
 ## 🚀 Features
 
 - 🧑‍🤝‍🧑 **Multi-user collaboration** per project
