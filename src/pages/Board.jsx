@@ -58,6 +58,21 @@ export default function Board() {
     }));
   };
 
+  const fetchTasks = async (projectId) => {
+    try {
+      console.log("Fetching tasks for project ID:", projectId);
+      const res = await axios.get(
+        `https://taskify-backend-o0m0.onrender.com/api/tasks/project/${projectId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setTasks(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
   const handleDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
     console.log(result);
@@ -73,7 +88,7 @@ export default function Board() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       socket.emit("task-change", id);
-      await fetchTasks();
+      await fetchTasks(id);
     } catch (err) {
       console.error(err);
     }
@@ -88,7 +103,7 @@ export default function Board() {
         }
       );
       socket.emit("task-change", id);
-      await fetchTasks();
+      await fetchTasks(id);
     } catch (err) {
       console.error(err);
     }
@@ -104,25 +119,11 @@ export default function Board() {
     console.log(res.data);
     setMembers(res.data);
   };
-  const fetchTasks = async () => {
-    try {
-      console.log("Fetching tasks for project ID:", id);
-      const res = await axios.get(
-        `https://taskify-backend-o0m0.onrender.com/api/tasks/project/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setTasks(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   useEffect(() => {
     const init = async () => {
       try {
-        await fetchTasks();
+        await fetchTasks(id);
         await fetchMembers(id);
       } catch (err) {
         console.error("Init error:", err);
@@ -135,7 +136,7 @@ export default function Board() {
 
     const handleTaskUpdate = async () => {
       console.log('Syncing Tasks');
-      await fetchTasks();
+      await fetchTasks(id);
     };
 
     socket.on("task-updated", handleTaskUpdate);
@@ -193,7 +194,7 @@ export default function Board() {
       }));
       setAssignedTo((prev) => ({ ...prev, [status]: "" }));
       setPriorities((prev) => ({ ...prev, [status]: "" }));
-      await fetchTasks();
+      await fetchTasks(id);
       socket.emit("task-change", id);
     } catch (err) {
       console.error(err);
