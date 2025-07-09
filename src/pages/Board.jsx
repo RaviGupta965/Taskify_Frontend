@@ -102,8 +102,8 @@ export default function Board() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      socket.emit("task-change", id);
       await fetchTasks(id);
+      socket.emit("task-change", id);
     } catch (err) {
       console.error(err);
     }
@@ -234,7 +234,7 @@ export default function Board() {
         }
       );
 
-      await fetchTasks();
+      await fetchTasks(id);
       setNewTasks((prev) => ({
         ...prev,
         [status]: { title: "", description: "" },
