@@ -15,8 +15,6 @@ export default function Signup() {
     e.preventDefault();
     try {
       const res = await axios.post('https://taskify-backend-o0m0.onrender.com/api/auth/register', form);
-      localStorage.setItem('user_data', JSON.stringify(res.data.user));
-      localStorage.setItem('token', res.data.token);
       navigate('/');
     } catch (err) {
       setError('Signup failed');

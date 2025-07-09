@@ -387,9 +387,6 @@ export default function Board() {
                 >
                   Smart Assign
                 </button>
-                {grouped[status].length === 0 ? (
-                  <p className="text-gray-500 italic text-sm">No tasks</p>
-                ) : (
                   <Droppable droppableId={status}>
                     {(provided) => (
                       <div
@@ -422,7 +419,6 @@ export default function Board() {
                       </div>
                     )}
                   </Droppable>
-                )}
               </div>
             ))}
           </div>
