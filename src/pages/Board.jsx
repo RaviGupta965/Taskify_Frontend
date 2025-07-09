@@ -132,9 +132,9 @@ export default function Board() {
 
     socket.emit("joinProject", id);
 
-    const handleTaskUpdate = () => {
+    const handleTaskUpdate = async () => {
       console.log('Syncing Tasks');
-      fetchTasks();
+      await fetchTasks();
     };
 
     socket.on("task-updated", handleTaskUpdate);
